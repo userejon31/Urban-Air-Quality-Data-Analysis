@@ -9,6 +9,9 @@ from sklearn.impute import KNNImputer
 from sklearn.preprocessing import StandardScaler
 
 
+from src.plot_style import AQUA_PRIMARY, GRAY_BORDER
+
+
 def select_numerical_columns(df: pd.DataFrame) -> list:
     """Select numeric columns suitable for KNNImputer (Section 3a)."""
     return df.select_dtypes(include=[np.number]).columns.tolist()
@@ -57,7 +60,13 @@ def compare_distributions(
             axes = [axes]
         for axis, (label, frame) in zip(axes, comparisons.items()):
             series = frame[column].dropna()
-            axis.hist(series, bins=25, alpha=0.75, color="#4c72b0", edgecolor="white")
+            axis.hist(
+                series,
+                bins=25,
+                alpha=0.75,
+                color=AQUA_PRIMARY,
+                edgecolor=GRAY_BORDER,
+            )
             axis.set_title(f"{column} - {label}")
             axis.set_xlabel(column)
             axis.set_ylabel("Count")

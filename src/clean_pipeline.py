@@ -37,19 +37,53 @@ def build_comparison_table(
     mean/median imputed vars, KNN imputed vars, outlier-treated vars.
     """
     metadata = metadata or {}
-    rows = [
-        {"metric": "rows_before", "value": before.shape[0]},
-        {"metric": "rows_after", "value": after.shape[0]},
-        {"metric": "columns_before", "value": before.shape[1]},
-        {"metric": "columns_after", "value": after.shape[1]},
-        {"metric": "missing_before", "value": int(before.isna().sum().sum())},
-        {"metric": "missing_after", "value": int(after.isna().sum().sum())},
-        {"metric": "columns_removed", "value": ", ".join(metadata.get("columns_removed", []))},
-        {"metric": "mean_median_imputed", "value": ", ".join(metadata.get("mean_median_imputed", []))},
-        {"metric": "knn_imputed", "value": ", ".join(metadata.get("knn_imputed", []))},
-        {"metric": "outlier_treated", "value": ", ".join(metadata.get("outlier_treated", []))},
-    ]
-    return pd.DataFrame(rows)
+    columns_removed = metadata.get("columns_removed", [])
+    mean_median_imputed = metadata.get("mean_median_imputed", [])
+    knn_imputed = metadata.get("knn_imputed", [])
+    outlier_treated = metadata.get("outlier_treated", [])
+
+    def _format_items(items: list) -> str:
+        return ", ".join(items) if items else "None"
+
+    return pd.DataFrame(
+        [
+            {
+                "Element": "Number of rows",
+                "Before Cleaning": before.shape[0],
+                "After Cleaning": after.shape[0],
+            },
+            {
+                "Element": "Number of columns",
+                "Before Cleaning": before.shape[1],
+                "After Cleaning": after.shape[1],
+            },
+            {
+                "Element": "Total missing values",
+                "Before Cleaning": int(before.isna().sum().sum()),
+                "After Cleaning": int(after.isna().sum().sum()),
+            },
+            {
+                "Element": "Columns removed",
+                "Before Cleaning": "None",
+                "After Cleaning": _format_items(columns_removed),
+            },
+            {
+                "Element": "Variables imputed with mean or median",
+                "Before Cleaning": "None",
+                "After Cleaning": _format_items(mean_median_imputed),
+            },
+            {
+                "Element": "Variables imputed with KNNImputer",
+                "Before Cleaning": "None",
+                "After Cleaning": _format_items(knn_imputed),
+            },
+            {
+                "Element": "Variables treated for outliers",
+                "Before Cleaning": "None",
+                "After Cleaning": _format_items(outlier_treated),
+            },
+        ]
+    )
 
 
 def export_clean_dataset(df: pd.DataFrame, path) -> None:
